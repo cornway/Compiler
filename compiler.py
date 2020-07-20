@@ -113,7 +113,7 @@ class Lexer(object):
         return index
 
     def print_log(self, style, value):
-        print '(%s, %s)' % (style, value)
+        print (style, value)
 
     def is_keyword(self, value):
         for item in keywords:
@@ -146,7 +146,7 @@ class Lexer(object):
                         i = self.skip_blank(i + 1)
                         break
                     else:
-                        print 'include error!'
+                        print ('include error!')
                         exit()
             elif content[i].isalpha() or content[i] == '_':
                 temp = ''
@@ -170,7 +170,7 @@ class Lexer(object):
                         i += 1
                     elif not content[i].isdigit():
                         if content[i] == '.':
-                            print 'float number error!'
+                            print ('float number error!')
                             exit()
                         else:
                             break
@@ -188,7 +188,7 @@ class Lexer(object):
                         else:
                             break
                     else:
-                        print 'error:lack of \"'
+                        print ('error:lack of \"')
                         exit()
                     self.tokens.append(Token(5, temp))
                     self.tokens.append(Token(4, '\"'))
@@ -295,7 +295,7 @@ class Parser(object):
             elif sentence_pattern == 'RB_BRACKET':
                 break
             else:
-                print 'block error!'
+                print ('block error!')
                 exit()
 
     # include
@@ -356,7 +356,7 @@ class Parser(object):
                             func_statement_tree.add_child_node(SyntaxTreeNode(self.tokens[self.index + 1].value, 'IDENTIFIER', {
                                                                'type': 'VARIABLE', 'variable_type': self.tokens[self.index].value}), param)
                         else:
-                            print '函数定义参数错误！'
+                            print ('??')
                             exit()
                         self.index += 1
                     self.index += 1
@@ -497,7 +497,7 @@ class Parser(object):
                 self._expression(if_tree.root, tmp_index)
                 self.index += 1
             else:
-                print 'error: lack of left bracket!'
+                print ('error: lack of left bracket!')
                 exit()
 
             if self.tokens[self.index].type == 'LB_BRACKET':
@@ -521,7 +521,7 @@ class Parser(object):
         elif token_type == 'FOR':
             self._for(father)
         else:
-            print 'error: control style not supported!'
+            print ('error: control style not supported!')
             exit()
 
     def _expression(self, father=None, index=None):
@@ -558,8 +558,8 @@ class Parser(object):
                         SyntaxTreeNode(self.tokens[self.index].value, '_ArrayName'))
                     self.index += 2
                     if self.tokens[self.index].type != 'DIGIT_CONSTANT' and self.tokens[self.index].type != 'IDENTIFIER':
-                        print 'error: 数组下表必须为常量或标识符'
-                        print self.tokens[self.index].type
+                        print ('error')
+                        print (self.tokens[self.index].type)
                         exit()
                     else:
                         tree.add_child_node(
@@ -617,7 +617,7 @@ class Parser(object):
                     new_tree.add_child_node(b.root, new_tree.root)
                     operand_stack.append(new_tree)
                 else:
-                    print 'operator %s not supported!' % item.current.value
+                    print ('operator ', item.current.value, ' not supported!')
                     exit()
         self.tree.add_child_node(operand_stack[0].root, father)
 
@@ -651,7 +651,7 @@ class Parser(object):
                             SyntaxTreeNode(self.tokens[self.index].value, 'ADDRESS'), params_list)
                     self.index += 1
             else:
-                print 'function call error!'
+                print ('function call error!')
                 exit()
             self.index += 1
         self.index += 1
@@ -720,14 +720,15 @@ class Parser(object):
             elif sentence_pattern == 'FUNCTION_CALL':
                 self._function_call()
             else:
-                print 'main error!'
+                print ('main error!')
                 exit()
 
     # DFS
     def display(self, node):
         if not node:
             return
-        print '( self: %s %s, father: %s, left: %s, right: %s )' % (node.value, node.type, node.father.value if node.father else None, node.left.value if node.left else None, node.right.value if node.right else None)
+        print ('( self: ', node.value, ',', node.type, ', father: ', node.father.value,
+                ', left: ', node.left.value if node.left else None, ', right: ', node.right.value if node.right else None, ' )')
         child = node.first_son
         while child:
             self.display(child)
@@ -756,7 +757,7 @@ class AssemblerFileHandler(object):
             self.result.insert(self.text_pointer, value)
             self.text_pointer += 1
         else:
-            print 'error!'
+            print ('error!')
             exit()
 
     def generate_ass_file(self):
@@ -790,7 +791,7 @@ class Assembler(object):
         while current_node:
             if current_node.value == 'FunctionName':
                 if current_node.first_son.value != 'main':
-                    print 'other function statement except for main is not supported!'
+                    print ('other function statement except for main is not supported!')
                     exit()
                 else:
                     self.ass_file_handler.insert('.globl main', 'TEXT')
@@ -848,7 +849,7 @@ class Assembler(object):
             if current_node.type == 'FUNCTION_NAME':
                 func_name = current_node.value
                 if func_name != 'scanf' and func_name != 'printf':
-                    print 'function call except scanf and printf not supported yet!'
+                    print ('function call except scanf and printf not supported yet!')
                     exit()
             elif current_node.value == 'CallParameterList':
                 tmp_node = current_node.first_son
@@ -860,7 +861,7 @@ class Assembler(object):
                             line = label + ': .asciz "' + tmp_node.value + '"'
                             self.ass_file_handler.insert(line, 'DATA')
                         else:
-                            print 'in functionc_call digital constant parameter is not supported yet!'
+                            print ('in functionc_call digital constant parameter is not supported yet!')
                             exit()
                         self.symbol_table[label] = {
                             'type': 'STRING_CONSTANT', 'value': tmp_node.value}
@@ -870,9 +871,9 @@ class Assembler(object):
                     elif tmp_node.type == 'ADDRESS':
                         pass
                     else:
-                        print tmp_node.value
-                        print tmp_node.type
-                        print 'parameter type is not supported yet!'
+                        print (tmp_node.value)
+                        print (tmp_node.type)
+                        print ('parameter type is not supported yet!')
                         exit()
                     tmp_node = tmp_node.right
             current_node = current_node.right
@@ -898,10 +899,10 @@ class Assembler(object):
                         self.ass_file_handler.insert(line, 'TEXT')
                         num += 2
                     else:
-                        print 'field type except int and float is not supported yet!'
+                        print ('field type except int and float is not supported yet!')
                         exit()
                 else:
-                    print 'parameter type not supported in printf yet!'
+                    print ('parameter type not supported in printf yet!')
                     exit()
             line = 'call printf'
             self.ass_file_handler.insert(line, 'TEXT')
@@ -916,7 +917,7 @@ class Assembler(object):
                     line = 'pushl $' + parameter
                     self.ass_file_handler.insert(line, 'TEXT')
                 else:
-                    print 'parameter type not supported in scanf!'
+                    print ('parameter type not supported in scanf!')
                     exit()
             line = 'call scanf'
             self.ass_file_handler.insert(line, 'TEXT')
@@ -953,10 +954,10 @@ class Assembler(object):
                     line = 'fstps ' + current_node.value
                     self.ass_file_handler.insert(line, 'TEXT')
             else:
-                print 'field type except int and float not supported!'
+                print ('field type except int and float not supported!')
                 exit()
         else:
-            print 'assignment wrong.'
+            print ('assignment wrong.')
             exit()
 
     # for
@@ -997,7 +998,7 @@ class Assembler(object):
         while current_node:
             if current_node.value == 'IfControl':
                 if current_node.first_son.value != 'Expression' or current_node.first_son.right.value != 'Sentence':
-                    print 'control_if error!'
+                    print ('control_if error!')
                     exit()
                 self._expression(current_node.first_son)
                 self.traverse(current_node.first_son.right.first_son)
@@ -1013,13 +1014,13 @@ class Assembler(object):
 
     # while
     def _control_while(self, node=None):
-        print 'while not supported yet!'
+        print ('while not supported yet!')
 
     # return
     def _return(self, node=None):
         current_node = node.first_son
         if current_node.value != 'return' or current_node.right.value != 'Expression':
-            print 'return error!'
+            print ('return error!')
             exit()
         else:
             current_node = current_node.right
@@ -1030,7 +1031,7 @@ class Assembler(object):
                 line = 'call exit'
                 self.ass_file_handler.insert(line, 'TEXT')
             else:
-                print 'return type not supported!'
+                print ('return type not supported!')
                 exit()
 
     def _traverse_expression(self, node=None):
@@ -1173,7 +1174,7 @@ class Assembler(object):
                         self.symbol_table['bss_tmp'] = {
                             'type': 'IDENTIFIER', 'field_type': 'float'}
                     else:
-                        print 'not supported yet!'
+                        print ('not supported yet!')
                         exit()
                 elif operator == '*':
                     if operand_a['type'] == 'ARRAY_ITEM':
@@ -1183,7 +1184,7 @@ class Assembler(object):
                             operand_a['operand'][0] + r'(, %edi, 4), %eax'
                         self.ass_file_handler.insert(line, 'TEXT')
                     else:
-                        print 'other MUL not supported yet!'
+                        print ('other MUL not supported yet!')
                         exit()
 
                     if operand_b['type'] == 'ARRAY_ITEM':
@@ -1193,7 +1194,7 @@ class Assembler(object):
                             operand_b['operand'][0] + '(, %edi, 4)'
                         self.ass_file_handler.insert(line, 'TEXT')
                     else:
-                        print 'other MUL not supported yet!'
+                        print ('other MUL not supported yet!')
                         exit()
                     line = r'movl %eax, bss_tmp'
                     self.ass_file_handler.insert(line, 'TEXT')
@@ -1232,7 +1233,7 @@ class Assembler(object):
                                 line += operand_a['operand']
                                 self.ass_file_handler.insert(line, 'TEXT')
                             else:
-                                print 'array item not supported when >='
+                                print ('array item not supported when >=')
                                 exit()
                         else:
                             pass
@@ -1242,7 +1243,7 @@ class Assembler(object):
                                 line = 'fcom ' + operand_b['operand']
                                 self.ass_file_handler.insert(line, 'TEXT')
                             else:
-                                print 'array item not supported when >='
+                                print ('array item not supported when >=')
                                 exit()
                         else:
                             if operand_b['type'] == 'CONSTANT':
@@ -1287,7 +1288,7 @@ class Assembler(object):
                 elif operator == '--':
                     pass
             else:
-                print 'operator not supported!'
+                print ('operator not supported!')
                 exit()
         result = {'type': self.operand_stack[0]['type'], 'value': self.operand_stack[
             0]['operand']} if self.operand_stack else {'type': '', 'value': ''}
@@ -1318,7 +1319,7 @@ class Assembler(object):
                 elif node.type == 'WhileControl':
                     self._control_while()
                 else:
-                    print 'control type not supported!'
+                    print ('control type not supported!')
                     exit()
             elif node.value == 'Expression':
                 self._expression(node)
@@ -1326,7 +1327,7 @@ class Assembler(object):
             elif node.value == 'Return':
                 self._return(node)
             else:
-                print 'sentenct type not supported yet！'
+                print ('sentenct type not supported yet！')
                 exit()
 
     def traverse(self, node=None):
@@ -1341,7 +1342,7 @@ def lexer():
     lexer = Lexer()
     lexer.main()
     for token in lexer.tokens:
-        print '(%s, %s)' % (token.type, token.value)
+        print (token.type, token.value)
 
 
 def parser():
@@ -1359,12 +1360,12 @@ if __name__ == '__main__':
     try:
         opts, argvs = getopt.getopt(sys.argv[1:], 's:lpah', ['help'])
     except:
-        print __doc__
+        print (__doc__)
         exit()
 
     for opt, argv in opts:
         if opt in ['-h', '--h', '--help']:
-            print __doc__
+            print (__doc__)
             exit()
         elif opt == '-s':
             file_name = argv.split('.')[0]
